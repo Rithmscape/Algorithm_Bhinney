@@ -19,19 +19,15 @@ class Solution {
 	private static boolean employee(int schedule, int[] log, int day) {
 
 		for (int i = 0; i < 7; i++) {
-			if (day == 6) {
+			if (day % 7 == 6 || day % 7 == 0) {
 				day++;
 				continue;
 			}
-
-			if (day == 7) {
-				day = 1;
-				continue;
-			}
-
+			
 			int time = change(log[i]);
 			if (time > schedule + 10) return false;
-			day++;
+
+            day++;
 		}
 
 		return true;
