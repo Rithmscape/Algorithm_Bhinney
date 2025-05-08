@@ -8,8 +8,8 @@ public class Main {
 		Scanner sc = new Scanner(System.in);
 		int N = sc.nextInt();
 
-		int[] arr = new int[301];
-		int[] dp = new int[301];
+		int[] arr = new int[N + 4];
+		int[] dp = new int[N + 4];
 		for (int i = 1; i <= N; i++)
 			arr[i] = sc.nextInt();
 
