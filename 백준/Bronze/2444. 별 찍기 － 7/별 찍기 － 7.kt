@@ -1,22 +1,16 @@
 fun main() = with(System.`in`.bufferedReader()) {
     val n = readln().toInt()
     val ans = StringBuilder()
-    var cnt = 1
 
-    for (i in 1 ..  n) {
-        repeat(n - i) {ans.append(" ")}
-        repeat(cnt) {ans.append("*")}
-        ans.append("\n")
-        cnt += 2
-    }
+    for (i in 1 ..  n)
+        ans.append(" ".repeat(n - i))
+            .append("*".repeat(2 * i - 1))
+            .append("\n")
 
-    cnt -= 4
-    for (i in n - 1 downTo  1) {
-        repeat(n - i) {ans.append(" ")}
-        repeat(cnt) {ans.append("*")}
-        ans.append("\n")
-        cnt -= 2
-    }
+    for (i in n - 1 downTo  1)
+        ans.append(" ".repeat(n - i))
+            .append("*".repeat(2 * i - 1))
+            .append("\n")
 
     println(ans.toString().trimEnd())
 }
