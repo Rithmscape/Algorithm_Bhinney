@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 class Solution {
-    public static int[][] solution(int[][] info) {
+    public int[][] solution(int[][] info) {
 		Node[] nodes = new Node[info.length];
 		for (int i = 0; i < info.length; i++)
 			nodes[i] = new Node(info[i][0], info[i][1], i + 1, null, null);
@@ -30,7 +30,7 @@ class Solution {
 
 
 	// 노드에 트리 정보 저장
-	private static void insert(Node parent, Node child) {
+	private void insert(Node parent, Node child) {
 		if (parent.x > child.x) {
 			if (parent.left == null) parent.left = child;
 			else insert(parent.left, child);
@@ -41,7 +41,7 @@ class Solution {
 		}
 	}
 
-	private static class Tree {
+	private class Tree {
 		private int preIdx = 0;
 		private int postIdx = 0;
 
@@ -61,7 +61,7 @@ class Solution {
 		}
 	}
 
-	private static class Node {
+	private class Node {
 		int x;
 		int y;
 		int value;
