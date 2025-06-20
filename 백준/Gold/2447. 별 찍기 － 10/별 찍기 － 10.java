@@ -1,43 +1,49 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
 	public static void main(String[] args) {
+		int n = input();
+		char[][] stars = solution(n);
+		output(stars);
+	}
+
+	private static char[][] solution(int n) {
+		char[][] stars = new char[n][n];
+		Arrays.stream(stars)
+			.forEach(it -> Arrays.fill(it, '*'));
+
+		blank(stars, 0, 0, n);
+
+		return stars;
+	}
+
+	private static void blank(char[][] stars, int r, int c, int size) {
+		if (size == 1) return;
+
+		int unit = size / 3;
+		for (int i = r + unit; i < r + 2 * unit; i++)
+			for (int j = c + unit; j < c + 2 * unit; j++)
+				stars[i][j] = ' ';
+
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				if (i == 1 && j == 1)
+					continue;
+
+				blank(stars, r + i * unit, c + j * unit, unit);
+			}
+		}
+	}
+
+	private static int input() {
 		Scanner sc = new Scanner(System.in);
-		int n = sc.nextInt();
-		sc.close();
-		solution(n);
+		return sc.nextInt();
 	}
 
-	private static void solution(int n) {
-		String[][] arr= new String[n][n];
-		dfs(arr, 0, 0, n, false);
-
-		for (int i = 0; i < n; i++) {
-			System.out.println(String.join("", arr[i]));
-		}
-	}
-
-	private static void dfs(String[][] arr, int x, int y, int n, boolean isBlank) {
-		if (isBlank) {
-			for (int i = x; i < x + n; i++) {
-				for (int j = y; j < y + n; j++)
-					arr[i][j] = " ";
-			}
-			return;
-		}
-
-		if (n == 1) {
-			arr[x][y] = "*";
-			return;
-		}
-
-		int len = n / 3;
-		int cnt = 0;
-		for (int i = x; i < x + n; i += len) {
-			for (int j = y; j < y + n; j += len){
-				cnt++;
-				dfs(arr, i, j, len, cnt == 5);
-			}
-		}
+	private static void output(char[][] stars) {
+		Arrays.stream(stars)
+			.map(String::new)
+			.forEach(System.out::println);
 	}
 }
