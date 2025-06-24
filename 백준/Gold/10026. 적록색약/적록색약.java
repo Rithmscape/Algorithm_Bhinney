@@ -12,9 +12,6 @@ public class Main {
 		output(ans);
 	}
 
-	private final static int[] dx = {-1, 1, 0, 0};
-	private final static int[] dy = {0, 0, -1, 1};
-
 	private static int[] solution(char[][] map) {
 		int[] ans = new int[2]; // ans[0] : 적록 색약이 어난 사람, ans[1] : 적록 색약인 사람
 
@@ -22,7 +19,7 @@ public class Main {
 		for (int i = 0; i < map.length; i++) {
 			for (int j = 0; j < map.length; j++) {
 				if (visited[i][j]) continue;
-				bfs(i, j, map[i][j], map, visited);
+				dfs(i, j, map[i][j], map, visited);
 				ans[0]++;
 			}
 		}
@@ -37,7 +34,7 @@ public class Main {
 		for (int i = 0; i < map.length; i++) {
 			for (int j = 0; j < map.length; j++) {
 				if (visited[i][j]) continue;
-				bfs(i, j, map[i][j], map, visited);
+				dfs(i, j, map[i][j], map, visited);
 				ans[1]++;
 			}
 		}
@@ -45,25 +42,15 @@ public class Main {
 		return ans;
 	}
 
-	private static void bfs(int x, int y, char target,  char[][] map, boolean[][] visited) {
-		Queue<int[]> queue = new LinkedList<>();
-		queue.offer(new int[]{x, y});
+	private static void dfs(int x, int y, char target,  char[][] map, boolean[][] visited) {
+		if (x < 0 || y < 0 || x >= map.length || y >= map.length || visited[x][y] || map[x][y] != target) return;
+
 		visited[x][y] = true;
 
-		while (!queue.isEmpty()) {
-			int[] cur = queue.poll();
-
-			for (int i = 0; i < 4; i++) {
-				int nx = cur[0] + dx[i];
-				int ny = cur[1] + dy[i];
-
-				if (nx < 0 || ny < 0 || nx >= map.length || ny >= map.length ||
-					visited[nx][ny] || map[nx][ny] != target) continue;
-
-				visited[nx][ny] = true;
-				queue.offer(new int[]{nx, ny});
-			}
-		}
+		dfs(x - 1, y, target, map, visited);
+		dfs(x + 1, y, target, map, visited);
+		dfs(x, y - 1, target, map, visited);
+		dfs(x, y + 1, target, map, visited);
 	}
 
 	private static char[][] input() throws IOException {
