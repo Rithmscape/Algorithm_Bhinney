@@ -26,29 +26,34 @@ public class Main {
 	}
 
 	private static String function(String p, int n, String str) {
-		if (p.chars().filter(it -> it == 'D').count() > n)
+		if (p.chars().filter(it -> it == 'D').count() > n) {
 			return ERROR;
+		}
 
 		Deque<String> dq = new ArrayDeque<>();
-		if (n > 0 && !str.isEmpty()) {
-			String[] arr = str.split(",");
-			for (String s : arr) {
-				dq.offerLast(s.trim());
+		if (n > 0) {
+			if (!str.isEmpty()) {
+				String[] arr = str.split(",");
+				for (String s : arr) {
+					dq.offerLast(s.trim());
+				}
 			}
 		}
 
 		boolean isReverse = false;
 		for (char command : p.toCharArray()) {
 			switch (command) {
-				case 'R' : {
+				case 'R':
 					isReverse = !isReverse;
 					break;
-				}
-				case 'D' : {
-					if (isReverse)
+				case 'D':
+					if (dq.isEmpty()) return ERROR;
+					if (isReverse) {
 						dq.pollLast();
-					else dq.pollFirst();
-				}
+					} else {
+						dq.pollFirst();
+					}
+					break;
 			}
 		}
 
