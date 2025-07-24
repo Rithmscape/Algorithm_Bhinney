@@ -3,15 +3,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
@@ -20,9 +13,9 @@ public class Main {
 	}
 
 	private static class TreeTraversal {
-		private List<Integer> inorder; // 중위 순회
-		private List<Integer> postorder; // 후위 순회
-		private List<Integer> preorder; // 전위 순회
+		private int[] inorder; // 중위 순회
+		private int[] postorder; // 후위 순회
+		private int[] preorder; // 전위 순회
 		private Map<Integer, Integer> inorderIdxMap; // 중위 순회 인덱스 map
 		private int preorderIdx; // 전위 순회 idx
 
@@ -35,90 +28,65 @@ public class Main {
 		private void input() throws IOException {
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
 				int n = Integer.parseInt(br.readLine());
-				this.inorder = toIntegerList(br.readLine());
-				this.postorder = toIntegerList(br.readLine());
-				this.preorder = new ArrayList<>(Collections.nCopies(n, 0));
+				this.inorder = toIntArray(br.readLine());
+				this.postorder = toIntArray(br.readLine());
+				this.preorder = new int[n];
 				this.inorderIdxMap = buildIdxMap(inorder);
 				this.preorderIdx = 0;
 			}
 		}
 
 		private void build() {
-			recursive(
-				new Range(0, inorder.size() - 1),
-				new Range(0, postorder.size() - 1)
-			);
+			recursive(0, inorder.length - 1, 0, postorder.length - 1);
 		}
 
-		private void recursive(Range inRange, Range postRange) {
-			if (!inRange.isValid() || !postRange.isValid()) return;
+		private void recursive(int is, int ie, int ps, int pe) {
+			if (is > ie || ps > pe)
+				return;
 
 			// 후위순위 마지막 원소가 노드의 root
-			int root = postorder.get(postRange.end);
-			preorder.set(preorderIdx++, root);
+			int root = postorder[pe];
+			preorder[preorderIdx++] = root;
 
 			// 중위 순회에서 root 찾기
-			int rootIdx = findRootIndex(root);
-			int leftSize = rootIdx - inRange.start;
+			int rootIdx = inorderIdxMap.get(root);
+			int leftSize = rootIdx - is;
 
 			// left
-			recursive(
-				new Range(inRange.start, rootIdx - 1),
-				new Range(postRange.start, postRange.start + leftSize - 1)
-			);
+			recursive(is, rootIdx - 1, ps, ps + leftSize - 1);
 
 			// right
-			recursive(
-				new Range(rootIdx + 1, inRange.end),
-				new Range(postRange.start + leftSize, postRange.end - 1)
-			);
+			recursive(rootIdx + 1, ie, ps + leftSize, pe - 1);
 		}
 
 		private void output() throws IOException {
 			try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out))) {
-				String result = preorder.stream().map(String::valueOf).collect(Collectors.joining(" "));
-				bw.write(result);
+				StringBuilder result = new StringBuilder();
+				for (int node : preorder)
+					result.append(node).append(" ");
+
+				bw.write(result.toString().trim());
 				bw.flush();
 			}
 		}
 
-// ---------------------------------------- input helper method ----------------------------------------
-		private List<Integer> toIntegerList(String line) {
-			return Arrays.stream(line.split(" "))
-				.map(Integer::parseInt)
-				.collect(Collectors.toList());
+		// ---------------------------------------- input helper method ----------------------------------------
+		private int[] toIntArray(String line) {
+			String[] arr = line.split(" ");
+			int[] result = new int[arr.length];
+			for (int i = 0; i < result.length; i++)
+				result[i] = Integer.parseInt(arr[i]);
+
+			return result;
 		}
 
-		private Map<Integer, Integer> buildIdxMap(List<Integer> array) {
-			return IntStream.range(0, array.size())
-				.boxed()
-				.collect(Collectors.toMap(array::get, Function.identity()));
-		}
+		private Map<Integer, Integer> buildIdxMap(int[] array) {
+			Map<Integer, Integer> map = new HashMap<>();
 
-// ---------------------------------------- build helper method ----------------------------------------
-		private int findRootIndex(int rootValue) {
-			return Optional.ofNullable(inorderIdxMap.get(rootValue))
-				.orElseThrow(() -> new IllegalStateException("root를 찾을 수 없습니다. \nvalue: " + rootValue));
-		}
-	}
+			for (int i = 0; i < array.length; i++)
+				map.put(array[i], i);
 
-// -------------------------------------------- helper class --------------------------------------------
-	private static class Range {
-		final int start;
-		final int end;
-
-		Range(int start, int end) {
-			this.start = start;
-			this.end = end;
-		}
-
-		boolean isValid() {
-			return start <= end;
-		}
-
-		@Override
-		public String toString() {
-			return String.format("[%d, %d]", start, end);
+			return map;
 		}
 	}
 }
