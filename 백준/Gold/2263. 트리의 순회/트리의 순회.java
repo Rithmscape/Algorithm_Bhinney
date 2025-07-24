@@ -3,67 +3,122 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
-		Tree data = input();
-		int[] answer = solution(data);
-		output(answer);
+		TreeTraversal traversal = new TreeTraversal();
+		traversal.solve();
 	}
 
-	private static int[] solution(Tree data) {
-		dfs(0, data.in.length - 1, 0, data.in.length - 1, 0, data);
-		return data.pre;
-	}
+	private static class TreeTraversal {
+		private List<Integer> inorder; // 중위 순회
+		private List<Integer> postorder; // 후위 순회
+		private List<Integer> preorder; // 전위 순회
+		private Map<Integer, Integer> inorderIdxMap; // 중위 순회 인덱스 map
+		private int preorderIdx; // 전위 순회 idx
 
-	private static int dfs(int is, int ie, int ps, int pe, int idx, Tree data) {
-		if (is > ie || ps > pe) return idx;
+		public void solve() throws IOException { // 사실상 문제를 푸는 곳
+			input();
+			build();
+			output();
+		}
 
-		data.pre[idx] = data.post[pe];
-		int pos = is;
-
-		for (int i = is; i <= ie; i++) {
-			if (data.in[i] == data.post[pe]) {
-				pos = i;
-				break;
+		private void input() throws IOException {
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+				int n = Integer.parseInt(br.readLine());
+				this.inorder = toIntegerList(br.readLine());
+				this.postorder = toIntegerList(br.readLine());
+				this.preorder = new ArrayList<>(Collections.nCopies(n, 0));
+				this.inorderIdxMap = buildIdxMap(inorder);
+				this.preorderIdx = 0;
 			}
 		}
 
-		idx = dfs(is, pos - 1, ps, ps + pos - is - 1, idx + 1, data);
-		idx = dfs(pos + 1, ie, ps + pos - is, pe - 1, idx, data);
+		private void build() {
+			recursive(
+				new Range(0, inorder.size() - 1),
+				new Range(0, postorder.size() - 1)
+			);
+		}
 
-		return idx;
+		private void recursive(Range inRange, Range postRange) {
+			if (!inRange.isValid() || !postRange.isValid()) return;
+
+			// 후위순위 마지막 원소가 노드의 root
+			int root = postorder.get(postRange.end);
+			preorder.set(preorderIdx++, root);
+
+			// 중위 순회에서 root 찾기
+			int rootIdx = findRootIndex(root);
+			int leftSize = rootIdx - inRange.start;
+
+			// left
+			recursive(
+				new Range(inRange.start, rootIdx - 1),
+				new Range(postRange.start, postRange.start + leftSize - 1)
+			);
+
+			// right
+			recursive(
+				new Range(rootIdx + 1, inRange.end),
+				new Range(postRange.start + leftSize, postRange.end - 1)
+			);
+		}
+
+		private void output() throws IOException {
+			try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out))) {
+				String result = preorder.stream().map(String::valueOf).collect(Collectors.joining(" "));
+				bw.write(result);
+				bw.flush();
+			}
+		}
+
+// ---------------------------------------- input helper method ----------------------------------------
+		private List<Integer> toIntegerList(String line) {
+			return Arrays.stream(line.split(" "))
+				.map(Integer::parseInt)
+				.collect(Collectors.toList());
+		}
+
+		private Map<Integer, Integer> buildIdxMap(List<Integer> array) {
+			return IntStream.range(0, array.size())
+				.boxed()
+				.collect(Collectors.toMap(array::get, Function.identity()));
+		}
+
+// ---------------------------------------- build helper method ----------------------------------------
+		private int findRootIndex(int rootValue) {
+			return Optional.ofNullable(inorderIdxMap.get(rootValue))
+				.orElseThrow(() -> new IllegalStateException("root를 찾을 수 없습니다. \nvalue: " + rootValue));
+		}
 	}
 
-	private static Tree input() throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		int n = Integer.parseInt(br.readLine());
-		int[] in = Arrays.stream(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
-		int[] post = Arrays.stream(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
-		br.close();
+// -------------------------------------------- helper class --------------------------------------------
+	private static class Range {
+		final int start;
+		final int end;
 
-		return new Tree(in, post);
-	}
+		Range(int start, int end) {
+			this.start = start;
+			this.end = end;
+		}
 
-	private static void output(int[] answer) throws IOException {
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		bw.write(IntStream.of(answer).mapToObj(String::valueOf).collect(Collectors.joining(" ")));
-		bw.flush();
-		bw.close();
-	}
+		boolean isValid() {
+			return start <= end;
+		}
 
-	private static class Tree {
-		int[] in;
-		int[] post;
-		int[] pre;
-
-		public Tree(int[] in, int[] post) {
-			this.in = in;
-			this.post = post;
-			this.pre = new int[in.length];
+		@Override
+		public String toString() {
+			return String.format("[%d, %d]", start, end);
 		}
 	}
 }
