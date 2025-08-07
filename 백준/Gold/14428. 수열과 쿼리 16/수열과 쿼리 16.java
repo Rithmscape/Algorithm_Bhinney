@@ -30,7 +30,7 @@ public class Main {
 					st.update(query.i - 1, query.v);
 				else
 					answer
-						.append(st.query(query.i - 1, query.v - 1) + 1)
+						.append(st.find(query.i - 1, query.v - 1) + 1)
 						.append("\n");
 			}
 		}
@@ -112,11 +112,11 @@ public class Main {
 			}
 		}
 
-		public int query(int left, int right) {
-			return query(1, 0, n - 1, left, right);
+		public int find(int left, int right) {
+			return find(1, 0, n - 1, left, right);
 		}
 
-		private int query(int node, int start, int end, int left, int right) {
+		private int find(int node, int start, int end, int left, int right) {
 			if (right < start || end < left)
 				return -1; // 범위를 벗어남.
 
@@ -124,8 +124,8 @@ public class Main {
 				return tree[node]; // 범위 안.
 
 			int mid = (start + end) / 2;
-			int lr = query(2 * node, start, mid, left, right);
-			int rr = query(2 * node + 1, mid + 1, end, left, right);
+			int lr = find(2 * node, start, mid, left, right); // left result
+			int rr = find(2 * node + 1, mid + 1, end, left, right); // right result
 
 			if (lr == -1) return rr;
 			if (rr == -1) return lr;
