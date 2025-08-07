@@ -11,7 +11,7 @@ public class Main {
 
 	private static class Solution {
 		private SegmentTree st;
-		private long[] series;
+		private int[] series;
 		private Query[] queries;
 		private StringBuilder answer;
 
@@ -39,7 +39,7 @@ public class Main {
 			try(BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
 				int n = Integer.parseInt(br.readLine());
 
-				series = new long[n];
+				series = new int[n];
 				String[] arr = br.readLine().split(" ");
 				for (int i = 0; i < n; i++)
 					series[i] = Integer.parseInt(arr[i]);
@@ -68,9 +68,9 @@ public class Main {
 	private static class SegmentTree {
 		int n;
 		int[] tree; // 구간의 최솟값의 인덱스 저장
-		long[] values; // 실제 값
+		int[] values; // 실제 값
 
-		public SegmentTree(long[] series) {
+		public SegmentTree(int[] series) {
 			this.n = series.length;
 			tree = new int[n * 4];
 			values = series.clone();
@@ -91,7 +91,7 @@ public class Main {
 			}
 		}
 
-		public void update(int idx, long value) {
+		public void update(int idx, int value) {
 			values[idx] = value;
 			update(1, 0, n - 1, idx);
 		}
