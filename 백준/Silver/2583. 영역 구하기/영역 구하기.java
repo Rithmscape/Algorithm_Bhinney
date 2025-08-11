@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,67 +15,73 @@ public class Main {
 	}
 
 	private static class Solution {
-		private int n, m;
-		private boolean[][] map;
-		private int count = 0;
-		private int size = 0;
-		List<Integer> sizes = new ArrayList<>();
+		private int rows, cols;
+		private boolean[][] blocked;
+
+		private final int[] dr = {-1, 1, 0, 0};
+		private final int[] dc = {0, 0, -1, 1};
 
 		public void solve() throws IOException {
 			input();
-			solution();
-			output();
+			List<Integer> result = solution();
+			output(result);
 		}
 
-		private void solution() {
-			boolean[][] visited = new boolean[map.length][map[0].length];
-			for (int i = 0; i < map.length; i++)
-				for (int j = 0; j < map[0].length; j++)
-					if (!visited[i][j] && !map[i][j]) {
-						find(i, j, visited);
-						count++;
+		private List<Integer> solution() {
+			List<Integer> sizes = new ArrayList<>();
+			boolean[][] visited = new boolean[blocked.length][blocked[0].length];
+			for (int i = 0; i < blocked.length; i++)
+				for (int j = 0; j < blocked[0].length; j++)
+					if (!visited[i][j] && !blocked[i][j]) {
+						int size = dfs(i, j, visited);
 						sizes.add(size);
-						size = 0;
 					}
+
+			Collections.sort(sizes);
+
+			return sizes;
 		}
 
-		private void find(int x, int y, boolean[][] check) {
-			if (x < 0 || y < 0 || x >= m || y >= n || map[x][y] || check[x][y]) return;
+		private int dfs(int r, int c, boolean[][] check) {
+			if (r < 0 || c < 0 || r >= rows || c >= cols || blocked[r][c] || check[r][c]) {
+				return 0;
+			}
 
-			check[x][y] = true;
-			size++;
+			check[r][c] = true;
+			int size = 1;
 
-			find(x + 1, y, check);
-			find(x - 1, y, check);
-			find(x, y + 1, check);
-			find(x, y - 1, check);
+			for (int i = 0; i < 4; i++)
+				size += dfs(r + dr[i], c + dc[i], check);
+
+			return size;
 		}
 
 		private void input() throws IOException {
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
-				int[] mnk = Arrays.stream(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
-				m = mnk[0];
-				n = mnk[1];
-				int k = mnk[2];
+				String[] arr = br.readLine().split(" ");
+				rows = Integer.parseInt(arr[0]);
+				cols = Integer.parseInt(arr[1]);
+				int k = Integer.parseInt(arr[2]);
 
-				map = new boolean[m][n];
+				blocked = new boolean[rows][cols];
 
 				for (int i = 0; i < k; i++) {
 					//[x1, y1, x2, y2]
 					int[] pos = Arrays.stream(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
 
-					for (int x = pos[1]; x < pos[3]; x++)
-						for (int y = pos[0]; y < pos[2]; y++) {
-							map[x][y] = true;
+					for (int r = pos[1]; r < pos[3]; r++)
+						for (int c = pos[0]; c < pos[2]; c++) {
+							blocked[r][c] = true;
 						}
 				}
 			}
 		}
 
-		private void output() throws IOException {
+		private void output(List<Integer> result) throws IOException {
 			try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out))) {
-				bw.write(String.valueOf(count) + "\n");
-				bw.write(sizes.stream().sorted().map(String::valueOf).collect(Collectors.joining(" ")));
+				bw.write(String.valueOf(result.size()));
+				bw.newLine();
+				bw.write(result.stream().map(String::valueOf).collect(Collectors.joining(" ")));
 				bw.flush();
 			}
 		}
