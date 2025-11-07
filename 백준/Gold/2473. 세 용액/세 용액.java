@@ -40,7 +40,7 @@ public class Main {
 						answer[2] = liquids[right];
 					}
 
-					if (sum == 0) break;
+					if (sum == 0) return;
 					else if (sum < 0) left++;
 					else right--;
 				}
