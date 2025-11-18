@@ -35,30 +35,30 @@ public class Main {
 
 	private static void check(List<List<Integer>> graph) {
 		Queue<Integer> q = new LinkedList<>();
-		int[] visited = new int[graph.size()];
+		int[] color = new int[graph.size()];
 
 		for (int i = 1; i < graph.size(); i++) {
-			if (visited[i] == 0) {
+			if (color[i] == 0) {
 				q.offer(i);
-				visited[i] = 1;
+				color[i] = 1;
 			}
 
 			while (!q.isEmpty()) {
 				int cur = q.poll();
 
 				for (int j = 0; j < graph.get(cur).size(); j++) {
-					if (visited[graph.get(cur).get(j)] == 0)
+					if (color[graph.get(cur).get(j)] == 0)
 						q.offer(graph.get(cur).get(j));
 
-					if (visited[graph.get(cur).get(j)] == visited[cur]) {
+					if (color[graph.get(cur).get(j)] == color[cur]) {
 						System.out.println("NO");
 						return;
 					}
 
-					if (visited[cur] == 1 && visited[graph.get(cur).get(j)] == 0)
-						visited[graph.get(cur).get(j)] = 2;
-					else if (visited[cur] == 2 && visited[graph.get(cur).get(j)] == 0)
-						visited[graph.get(cur).get(j)] = 1;
+					if (color[cur] == 1 && color[graph.get(cur).get(j)] == 0)
+						color[graph.get(cur).get(j)] = 2;
+					else if (color[cur] == 2 && color[graph.get(cur).get(j)] == 0)
+						color[graph.get(cur).get(j)] = 1;
 				}
 			}
 		}
