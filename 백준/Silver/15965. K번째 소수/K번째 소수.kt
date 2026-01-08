@@ -6,28 +6,31 @@ fun main() {
     val k = sc.nextInt()
     sc.close()
 
-    val prime = isPrime()
-    val list = mutableListOf<Long>()
+    val limit = 8_000_000
+    val prime = isPrime(limit)
 
-    for (i in 2L .. prime.lastIndex) {
-        if (!prime[i.toInt()]) list.add(i)
-        if (list.size == k) break
+    var count = 0
+    for (i in 2 until limit) {
+        if (!prime[i]) { count++
+            if (count == k) {
+                println(i)
+                return
+            }
+        }
     }
-
-    println(list[k - 1])
 }
 
-private fun isPrime() : BooleanArray {
-    val prime = BooleanArray(800_002) { false }
+private fun isPrime(limit : Int) : BooleanArray {
+    val prime = BooleanArray(limit) { false }
     prime[0] = true
     prime[1] = true
 
-    for (i in 2 .. sqrt(prime.size.toDouble()).toInt()) {
+
+    for (i in 2..sqrt(limit.toDouble()).toInt()) {
         if (prime[i]) continue
-
-        for (j in i * i ..< prime.size step i)
+        for (j in i * i until limit step i) {
             prime[j] = true
-
+        }
     }
 
     return prime
