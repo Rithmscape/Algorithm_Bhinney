@@ -23,7 +23,7 @@ public class Main {
 				}
 			}
 		} else {
-			if (n - 6 >= 2 && primes[n - 6]) {
+			if (primes[n - 6]) {
 				System.out.println("2 2 2 " + (n - 6));
 				return;
 			}
